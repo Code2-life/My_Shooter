@@ -1,11 +1,5 @@
 package frc.robot;
 
-
-
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
-
 public class Shooter_math {
     double velocity;
     double distance;
@@ -33,25 +27,30 @@ public class Shooter_math {
     }
 
     public double distanceFromGoal(){ 
-        NetworkTable table = NetworkTableInstance.getDefault().getTable("limelight");
-        NetworkTableEntry ty = table.getEntry("ty");
-        double targetOffsetAngle_Vertical = ty.getDouble(0.0);
+       if (!LimelightHelpers.getTV("limelight")) {
+        return distance; // Return the last calculated distance if target is lost
+    }
 
-        // how many degrees back is your limelight rotated from perfectly vertical?
+        //Get the vertical offset (ty) from LimelightHelpers
+        double targetOffsetAngle_Vertical = LimelightHelpers.getTY("limelight");
+
+        //Get your constants from the Constants file
         double limelightMountAngleDegrees = Constants.ShooterConstants.AngleOfLimeLight; 
-
-        // distance from the center of the Limelight lens to the floor
         double limelightLensHeightInches = Constants.ShooterConstants.heightOfLimeLight; 
-
-        // distance from the target to the floor
         double goalHeightInches = Constants.ShooterConstants.heightOfTarget * 39.37; // convert meters to inches
 
+        //Calculate the total angle to the target
         double angleToGoalDegrees = limelightMountAngleDegrees + targetOffsetAngle_Vertical;
-        double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+        double angleToGoalRadians = Math.toRadians(angleToGoalDegrees);
 
-        //calculate distance
+        //Calculate horizontal distance (X)
+        // Formula: (TargetHeight - CameraHeight) / tan(TotalAngle)
         double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
-        return distanceFromLimelightToGoalInches/39.37; // convert inches to meters
+
+        //Update the global distance variable (converted to meters)
+        distance = distanceFromLimelightToGoalInches / 39.37; 
+        
+        return distance;
     }
 
 
@@ -61,7 +60,7 @@ public class Shooter_math {
      */
     public double min_velocity(){
         distance = distanceFromGoal(); // Need to account for difference in the limelight's height and the shooter's height
-
+        // distance  =  LimelightHelpers.getBotPose_TargetSpace("limelight")[0]; (can be used but is less reliable)
 
         velocity = Math.sqrt(gravity*(height_of_target+Math.sqrt(Math.pow(height_of_target, 2)+Math.pow(distance, 2)))); // The above formula is used to calculate the minimum velocity need to shoot the projectile. It is from a physics textbook.
         
@@ -71,7 +70,7 @@ public class Shooter_math {
 
     public double min_angle(){
         distance = distanceFromGoal();
-        
+
         angle = Math.atan((height_of_target+Math.sqrt(Math.pow(height_of_target, 2)+Math.pow(distance, 2)))/distance); // min angle required to get to the distance
         
         return angle*(180/Math.PI); // convert radians to degrees
