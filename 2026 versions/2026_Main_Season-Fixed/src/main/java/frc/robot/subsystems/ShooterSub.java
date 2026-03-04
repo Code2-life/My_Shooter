@@ -10,15 +10,24 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants;
 
 public class ShooterSub {
+
     Optional<DriverStation.Alliance> alliance;
+    
     int targetTagID;
+    
     NetworkTable limelightTable;
+    
+    
     public ShooterSub(){
+        limelightTable = NetworkTableInstance.getDefault().getTable("limelight");
+        
         alliance = DriverStation.getAlliance();
+        
         if (alliance.isPresent() && alliance.get() == DriverStation.Alliance.Red) {
         targetTagID = Constants.ShooterConstants.LimeLightID_RED; // Example Red ID
     } else {
@@ -54,10 +63,6 @@ public class ShooterSub {
 
         // Set the Slot 0 gains (for Velocity control) - has more values than just PID
         Slot0Configs slot0 = configs.Slot0; 
-
-        slot0.kS = 0.25; // Voltage to overcome static friction (start with 0.1 - 0.2)
-
-        slot0.kV = 0.12; // Velocity feedforward (Volts per RPS)
         
         slot0.kP = P; // Proportional gain (Volts per unit of error)
         

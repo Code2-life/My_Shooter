@@ -18,9 +18,9 @@ public final class Constants {
   }
 
   public static class ShooterConstants {
-    public static final int left_shooter_id = 1;
+    public static final int left_shooter_id = 3;
     public static final int right_shooter_id = 2; // need to change all of these
-    public static final int pivot_id = 3;
+    public static final int pivot_id = 4;
 
     public static final double radius_of_wheels = 0.5; // need to change later
 
