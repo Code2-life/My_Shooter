@@ -48,7 +48,7 @@ public class Shooter_math {
         double distanceFromLimelightToGoalInches = (goalHeightInches - limelightLensHeightInches) / Math.tan(angleToGoalRadians);
 
         //Update the global distance variable (converted to meters)
-        distance = distanceFromLimelightToGoalInches / 39.37; 
+        distance = distanceFromLimelightToGoalInches/39.37; 
         
         return distance;
     }
